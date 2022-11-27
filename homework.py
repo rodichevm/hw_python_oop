@@ -85,14 +85,6 @@ class SportsWalking(Training):
         super().__init__(action, duration, weight)
         self.height = height
 
-    #   def get_spent_calories(self) -> float:
-    #        """Считает калории для спортивной ходьбы"""
-    #        return ((self.CALORIES_WEIGHT_MULTIPLIER * self.weight
-    #                 + ((self.get_mean_speed() * self.KMH_IN_MSEC) ** 2
-    #                    / (self.height / self.CM_IN_M)
-    #                    * self.CALORIES_SPEED_HEIGHT_MULTIPLIER * self.weight)
-    #                 * (self.duration * self.MIN_IN_H)))
-
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
 
