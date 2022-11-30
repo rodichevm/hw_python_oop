@@ -57,10 +57,6 @@ class Training:
             self.get_spent_calories()
         )
 
-    @classmethod
-    def get_number_fields(cls):
-        return len(fields(cls))
-
 
 @dataclass
 class Running(Training):
@@ -89,7 +85,7 @@ class SportsWalking(Training):
     CALORIES_SPEED_HEIGHT_MULTIPLIER = 0.029
     KMH_IN_MSEC = round(Training.M_IN_KM / (Training.MIN_IN_H * 60), 3)
 
-    height: int
+    height: float
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
@@ -112,7 +108,7 @@ class Swimming(Training):
     CALORIES_MEAN_SPEED_MULTIPLIER = 1.1
     CALORIES_MEAN_SPEED_SHIFT = 2
 
-    length_pool: int
+    length_pool: float
     count_pool: int
 
     def get_mean_speed(self) -> float:
@@ -129,22 +125,30 @@ class Swimming(Training):
                 * self.weight * self.duration)
 
 
-WORKOUT_TYPES = {'SWM': (Swimming, Swimming.get_number_fields()),
-                 'RUN': (Running, Running.get_number_fields()),
-                 'WLK': (SportsWalking, SportsWalking.get_number_fields())}
+def get_number_fields(cls):
+    return len(fields(cls))
 
-ERROR = '{workout_type} is not found'
-ERROR_2 = 'У класса "{class_name}" должно быть {number} параметров'
+
+WORKOUT_TYPES = {'SWM': (Swimming, get_number_fields(Swimming)),
+                 'RUN': (Running, get_number_fields(Running)),
+                 'WLK': (SportsWalking, get_number_fields(SportsWalking))}
+
+WORKOUT_TYPE_ERROR = '{workout_type} is not found'
+NUMBER_OF_PARAMS_ERROR = ('У класса "{class_name}" должно быть '
+                          '{number_of_fields} параметра. '
+                          'Передано {input_number} параметра.')
 
 
 def read_package(workout_type, data) -> Training:
     """Прочитать данные полученные от датчиков."""
-    link_to_class, number_of_fields = WORKOUT_TYPES[workout_type]
     if workout_type not in WORKOUT_TYPES:
-        raise ValueError(ERROR.format(workout_type))
+        raise ValueError(WORKOUT_TYPE_ERROR.format(workout_type))
+    link_to_class, number_of_fields = WORKOUT_TYPES[workout_type]
     if len(data) != number_of_fields:
-        raise ValueError(ERROR_2.format(class_name=link_to_class,
-                                        number=number_of_fields))
+        raise ValueError(NUMBER_OF_PARAMS_ERROR.format(
+            class_name=link_to_class,
+            number_of_fields=number_of_fields,
+            input_number=len(data)))
     return link_to_class(*data)
 
 
